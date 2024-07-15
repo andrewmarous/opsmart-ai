@@ -1,1 +1,4 @@
 /.idea
+/product_classifier_raw
+/product_classifier/build
+/product_classifier/model_training/data

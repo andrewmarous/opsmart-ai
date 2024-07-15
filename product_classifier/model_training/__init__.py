@@ -1,1 +1,1 @@
-from image_model import train_model
+from .image_model import train_model

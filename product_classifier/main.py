@@ -30,6 +30,18 @@ def init_model(weights_path, dict_path):
     global label_dict
     global model
     global device
+
+    if not os.path.exists('model.pth'):
+        print('Model not found. Creating training and validation splits...')
+        if not os.path.exists('model_training/data/'):
+            print('Error: no data has been found. Please place a folder named "data" in this directory and try again. ')
+            exit(500)
+        os.system('python dataset_builder.py')
+        print('Training and validation splits created. Training model...')
+        label_dict = read_dict_csv(dict_path)
+        image_model.train_model(num_classes=len(label_dict))
+        print('Model training complete.')
+
     # create class reference dictionary
     label_dict = read_dict_csv(dict_path)
 
@@ -46,15 +58,6 @@ def init_model(weights_path, dict_path):
     model = model.to(device)
 
     # load model weights and set to evaluation mode
-    if not os.path.exists('model.pth'):
-        print('Model not found. Creating training and validation splits...')
-        if not os.path.exists('model_training/data/'):
-            print('Error: no data has been found. Please place a folder named "data" in this directory and try again. ')
-            exit(500)
-        os.system('python dataset_builder.py')
-        print('Training and validation splits created. Training model...')
-        image_model.train_model(num_classes=len(label_dict))
-        print('Model training complete.')
 
     model.load_state_dict(torch.load(weights_path, map_location=device))
     model.eval()

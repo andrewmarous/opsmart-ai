@@ -1,14 +1,15 @@
-# Op-Smart Product Classifier
+# Op-Smart AI Suite
 
-This project is an image classification model meant to be paired with the Op-Smart manufacturing management system. The model can be accessed through a Flask API endpoint.
+This project is the complete suite of AI tools used by Op-Smart, Inc. 
 
 ## Table of Contents
 
 - [Introduction](#introduction)
 - [Installation](#installation)
+- [Product Classifier](#product-classifier)
+- [Image Splitter](#image-splitter)
+- [QA Evaluator](#qa-evaluator)
 - [Usage](#usage)
-- [API](#api)
-- [Contributing](#contributing)
 - [License](#license)
 
 ## Introduction
@@ -32,8 +33,8 @@ To get started, you need to have Python 3.8+ installed. You can set up the proje
 1. **Clone the repository:**
 
     ```bash
-    git clone https://github.com/andrewmarous/opsmart-product-classifier.git
-    cd opsmart-product-classifier
+    git clone https://github.com/andrewmarous/opsmart-ai.git
+    cd product_classifier
     ```
 
 2. **Create a virtual environment:**
@@ -49,11 +50,11 @@ To get started, you need to have Python 3.8+ installed. You can set up the proje
     pip install -r requirements.txt
     ```
 
-4. **Set the environment variable for MPS fallback:**
+## Product Classifier
 
-    ```bash
-    export PYTORCH_ENABLE_MPS_FALLBACK=1
-    ```
+## Image Splitter
+
+## QA Evaluator
 
 ## Usage
 
@@ -61,3 +62,6 @@ To start the server, run:
 
 ```bash
 python server.py
+```
+
+## License
