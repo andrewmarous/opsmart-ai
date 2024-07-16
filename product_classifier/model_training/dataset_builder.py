@@ -1,9 +1,16 @@
 import random
 import csv
 import glob
+import argparse
+
+parser = argparse.ArgumentParser(description='Process training data path.')
+parser.add_argument('--data', '-d', type=str, nargs='?')
+args = parser.parse_args()
+
+data_path = args.data
 
 # get subfolder names
-subfolders = glob.glob('data/*')
+subfolders = glob.glob(data_path + '*')
 for i in range(len(subfolders)):
     subfolders[i] = subfolders[i][5:]
 class_dict = {subfolders[i]: i+1 for i in range(len(subfolders))}

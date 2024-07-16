@@ -26,39 +26,35 @@ def read_dict_csv(filepath):
     return csv_dict
 
 
+def train_model(data_filepath, dict_path):
+    global label_dict
+
+    os.system('python model_training/dataset_builder.py --data ' + data_filepath)
+    label_dict = read_dict_csv(dict_path)
+    l1_reg = input("Enter a ")
+    image_model.train_model(len(label_dict))
+
+
 def init_model(weights_path, dict_path):
     global label_dict
     global model
     global device
 
     if not os.path.exists('model.pth'):
-        print('Model not found. Creating training and validation splits...')
-        if not os.path.exists('model_training/data/'):
-            print('Error: no data has been found. Please place a folder named "data" in this directory and try again. ')
-            exit(500)
-        os.system('python dataset_builder.py')
-        print('Training and validation splits created. Training model...')
-        label_dict = read_dict_csv(dict_path)
-        image_model.train_model(num_classes=len(label_dict))
-        print('Model training complete.')
+        print('Error: "model.pth" not found. Please place training data in this directory (or designate the data location with --data_path) and run '
+              '"python main.py --train" in the console.')
+        exit(500)
 
     # create class reference dictionary
     label_dict = read_dict_csv(dict_path)
 
     # assign computation device and initialize model frame
-    device = (
-        "cuda"
-        if torch.cuda.is_available()
-        else "mps"
-        if torch.backends.mps.is_available()
-        else "cpu"
-    )
+    device = image_model.find_device()
     print(f"Using: {device}")
     model = image_model.CustomEfficientNet(len(label_dict))
     model = model.to(device)
 
     # load model weights and set to evaluation mode
-
     model.load_state_dict(torch.load(weights_path, map_location=device))
     model.eval()
 
@@ -110,14 +106,32 @@ parser.add_argument('--model_path', type=str, default='model.pth', nargs='?',
                     help='path to the model based on working directory')
 parser.add_argument('--label_path', type=str, default='label_dict.csv', nargs='?',
                     help='path to the labels based on working directory')
+parser.add_argument('--data_path', '-d', type=str, default='data/', nargs='?',
+                    help='path to the training data')
 parser.add_argument('--port', type=int, default=5000, nargs='?',
                     help='port you want to use')
+parser.add_argument('--train', '-t', action='store_true', help="Set this flag if you want the model to train itself using present data")
 args = parser.parse_args()
 # model_path = args.model_path
 # dictionary_path = args.label_path
 port = args.port
 model_path = args.model_path
 dictionary_path = args.label_path
+data_path = args.data_path
+
+if args.train:
+    print("Application started in training mode. Once this is complete, any model.pth will be rewritten if it exists.")
+    answer = ''
+    valid_answers = {'y', 'n'}
+    while answer not in valid_answers:
+        answer = input('Are you sure you want to continue? (y/n)')
+    if answer == 'n':
+        exit(500)
+    if not os.path.exists(data_path):
+        print('Error: no data has been found. Please place a folder named "data" in this directory (or designate the data location with --data_path) and try again. ')
+        exit(500)
+    train_model(data_path, dictionary_path)
+
 
 init_model(model_path, dictionary_path)
 

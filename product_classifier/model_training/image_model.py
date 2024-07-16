@@ -1,5 +1,6 @@
 import pandas as pd
 from PIL import Image
+import platform
 
 import torch
 import torch.nn as nn
@@ -166,6 +167,56 @@ def _l2_regularization(model, l2_lambda):
     return l2_lambda * l2_norm
 
 
+def _train_full_pass(train_dataloader, val_dataloader, model, loss_fn, optimizer, device, num_classes, l1_lam=None,
+                     l2_lam=None):
+    """
+    Trains a PyTorch neural network.
+
+    :param train_dataloader: the dataloader containing the training data
+    :param val_dataloader: the dataloader containing the validation data
+    :param nn.Module model: the neural network to be trained
+    :param nn.Module loss_fn: the loss metric
+    :param optimizer: the optimization algorithm
+    :param device: the device to compute on
+    :param int num_classes: the number of classes in the prediction set
+    :param float l1_lam: the optional L1 regularization coefficient
+    :param float l2_lam: the optional L2 regularization coefficient
+    :return: 1 if model is done training, 0 otherwise
+    """
+    size = len(train_dataloader.dataset)
+    model.train()
+    model.to(device)
+    for batch, (X, y) in enumerate(train_dataloader):
+        X, y = X.to(device), y.to(device)
+
+        # compute error
+        pred = model(X)
+        if l1_lam and l2_lam:
+            reg = _l1_regularization(model, l1_lam) + _l2_regularization(model, l2_lam)
+        elif l1_lam:
+            reg = _l1_regularization(model, l1_lam)
+        elif l2_lam:
+            reg = _l2_regularization(model, l2_lam)
+        else:
+            reg = 0
+        loss = loss_fn(pred, y) + reg
+
+        # Backprop
+        loss.backward()
+        optimizer.step()
+        optimizer.zero_grad()
+
+        if batch % 100 == 0:
+            loss, current = loss.item(), (batch + 1) * len(X)
+            print(f"loss: {loss:>7f} [{current:>5d}/{size:>5d}]")
+
+    val_result = _validate(val_dataloader, model, loss_fn, device)
+    if val_result == 1:
+        return 1
+    else:
+        return 0
+
+
 def _train(train_dataloader, val_dataloader, model, loss_fn, optimizer, device, num_classes, l1_lam=None, l2_lam=None):
     """
     Trains a PyTorch neural network.
@@ -258,7 +309,7 @@ def _validate(dataloader, model, loss_fn, device):
 
 def find_device():
     """Returns the most suitable computation device."""
-    return "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
+    return "cuda" if torch.cuda.is_available() else "mps" if platform.system() == "Darwin" and torch.backends.mps.is_available() else "cpu"
 
 
 def train_model(num_classes):
@@ -275,11 +326,13 @@ def train_model(num_classes):
                                                transforms()))
     validation_dataloader = DataLoader(ImageDataset('validation_labels.csv', 'data', models.EfficientNet_V2_M_Weights.
                                                     DEFAULT.transforms()))
-    l1_reg = len(train_dataloader.dataset) / 6500000 - 0.0000334516
+    l1_reg = 2e-5
 
     epochs = 50
+    _train_full_pass(train_dataloader, validation_dataloader, model, loss_fn, optimizer, device=find_device(),
+           num_classes=num_classes, l1_lam=l1_reg)
     for t in range(epochs):
         if _train(train_dataloader, validation_dataloader, model, loss_fn, optimizer, device=find_device(),
-                 num_classes=num_classes, l1_lam=l1_reg) == 1:
+                  num_classes=num_classes, l1_lam=l1_reg) == 1:
             torch.save(model.state_dict(), 'model.pth')
             break

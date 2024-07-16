@@ -2,3 +2,7 @@
 /product_classifier_raw
 /product_classifier/build
 /product_classifier/model_training/data
+/aidev
+/product_classifier/data
+/product_classifier/classification_model.egg-info
+/product_classifier/dist

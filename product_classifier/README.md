@@ -44,10 +44,21 @@ To get started, <b>you need to have Python 3.10+ installed.</b> The installer fo
    ```
    Running the model once in a standalone command prompt or PowerShell instance before production usage is very important. 
    If the model has not been trained yet or there is not a file named "model.pth" present in the package directory, the package will attempt to train a new model.
-   **If there is no data in the "model_training" folder when this happens, THE CLASSIFICATION SERVER WILL NOT START**. There must either be a "model.pth" file
+   **If there is no data in the root folder when this happens, THE CLASSIFICATION SERVER WILL NOT START**. There must either be a "model.pth" file
    or training data present for the server to function correctly. 
 
 ## Product Classifier
+
+1. **Training:**
+
+   On the first startup of the classification server, once data is present, the model will begin training. It will ask for a **regularization coefficient** in the console, and wait for a user input.
+   The regularization coefficient (hereby referred to as λ) is a hyperparameter: a parameter that will affect the training process of the model. 
+   It is meant to help adjust the training process so that it can run on multiple dataset sizes.
+
+   **A good λ to start at is 1e-6**. Enter that, then let the model begin training. If the first loss value reported is above 15, restart the program and enter a slightly lower λ . If the first loss value reported is below 10, restart the program and enter a slightly higher λ.
+   For the model to train properly, you need the first loss value to be between 10 and 15. 
+   
+   *For example*: on a dataset of 2600 images, the model reached 100% accuracy with λ = 2e-5.
 
 ## Image Splitter
 

@@ -19,7 +19,7 @@ setup(
         "flask",
         "torch",
         "torchvision",
-        "numpy",
+        "numpy==1.26.4",
         "pandas"
     ],
     classifiers=[
