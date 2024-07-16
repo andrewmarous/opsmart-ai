@@ -28,27 +28,24 @@ Any prediction request should follow this format:
 
 ## Installation
 
-To get started, you need to have Python 3.8+ installed. You can set up the project using the following steps:
+To get started, <b>you need to have Python 3.10+ installed.</b> The installer for Python 3.11, which fulfills this requirement, can be downloaded by [clicking this link.](https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe) You can set up the project using the following steps:
 
-1. **Clone the repository:**
 
-    ```bash
-    git clone https://github.com/andrewmarous/opsmart-ai.git
-    cd product_classifier
-    ```
-
-2. **Create a virtual environment:**
-
-    ```bash
-    python -m venv venv
-    source venv/bin/activate  # For Windows use `venv\Scripts\activate`
-    ```
-
-3. **Install the dependencies:**
+1. **Install the dependencies:**
 
     ```bash
     pip install -r requirements.txt
     ```
+2. **Run the classification model:**
+
+   ```bash
+   # In the product_classifier folder:
+   python main.py
+   ```
+   Running the model once in a standalone command prompt or PowerShell instance before production usage is very important. 
+   If the model has not been trained yet or there is not a file named "model.pth" present in the package directory, the package will attempt to train a new model.
+   **If there is no data in the "model_training" folder when this happens, THE CLASSIFICATION SERVER WILL NOT START**. There must either be a "model.pth" file
+   or training data present for the server to function correctly. 
 
 ## Product Classifier
 
