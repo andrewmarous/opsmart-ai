@@ -312,7 +312,7 @@ def find_device():
     return "cuda" if torch.cuda.is_available() else "mps" if platform.system() == "Darwin" and torch.backends.mps.is_available() else "cpu"
 
 
-def train_model(num_classes):
+def train_model(num_classes, l1_lam):
     """
     Training loop for the classification model. It automatically exits once the model has been fully trained
     :param num_classes: the number of classes to be predicted
@@ -326,13 +326,12 @@ def train_model(num_classes):
                                                transforms()))
     validation_dataloader = DataLoader(ImageDataset('validation_labels.csv', 'data', models.EfficientNet_V2_M_Weights.
                                                     DEFAULT.transforms()))
-    l1_reg = 2e-5
 
     epochs = 50
     _train_full_pass(train_dataloader, validation_dataloader, model, loss_fn, optimizer, device=find_device(),
-           num_classes=num_classes, l1_lam=l1_reg)
+           num_classes=num_classes, l1_lam=l1_lam)
     for t in range(epochs):
         if _train(train_dataloader, validation_dataloader, model, loss_fn, optimizer, device=find_device(),
-                  num_classes=num_classes, l1_lam=l1_reg) == 1:
+                  num_classes=num_classes, l1_lam=l1_lam) == 1:
             torch.save(model.state_dict(), 'model.pth')
             break

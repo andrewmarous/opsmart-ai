@@ -14,21 +14,13 @@ This project is the complete suite of AI tools used by Op-Smart, Inc.
 
 ## Introduction
 
-This project has two pieces: the server, and the model trainer.
+This project is a collection of every AI tool used in the Op-Smart InLine product assessment and analytics software.
 
-On startup, the server will check for the stored model weights. If they are present, the model will be initialized and the server will start running. If
-they are not present, the server will check for the presence of image data, which it will start training on if present. 
-
-If the model weights are detected, the server will initialize the model with those weights and start waiting for prediction requests. 
-Any prediction request should follow this format:
-
-```bash
-   curl --data-raw "{\"file_name\":\"/your/file/path\"}" -H "Content-Type: application/json" -L -X POST http://localhost:5000/predict >/your/file/path.txt
-```
+There are three components: the product classifier, the image splitter, and the quality assurance evaluator. Please see their respective sections for more information about each.
 
 ## Installation
 
-To get started, <b>you need to have Python 3.10+ installed.</b> The installer for Python 3.11, which fulfills this requirement, can be downloaded by [clicking this link.](https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe) You can set up the project using the following steps:
+To get started, <b>you need to have Python 3.10+ installed.</b> The Windows installer for Python 3.11, which fulfills this requirement, can be downloaded by [clicking this link.](https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe) You can set up the project using the following steps:
 
 
 1. **Install the dependencies:**
@@ -36,29 +28,40 @@ To get started, <b>you need to have Python 3.10+ installed.</b> The installer fo
     ```bash
     pip install -r requirements.txt
     ```
-2. **Run the classification model:**
+2. **Run the classification model in training mode:**
 
    ```bash
    # In the product_classifier folder:
-   python main.py
+   python main.py --train
+   # OR (if training data not in product_classifier folder)
+   python main.py --train --data "C:\path\to\your\data"
    ```
-   Running the model once in a standalone command prompt or PowerShell instance before production usage is very important. 
-   If the model has not been trained yet or there is not a file named "model.pth" present in the package directory, the package will attempt to train a new model.
-   **If there is no data in the root folder when this happens, THE CLASSIFICATION SERVER WILL NOT START**. There must either be a "model.pth" file
-   or training data present for the server to function correctly. 
+   This will train the model to work with a specific dataset. Without training the model first, the server will not work.
+
+   During training, you will be asked for a *regularization coefficient* (see [Product Classifier](#product-classifier) for more information).
+   Once that is entered, the model will begin training and stop once it reaches 100% accuracy. The server will start running once training has completed.
 
 ## Product Classifier
 
 1. **Training:**
 
-   On the first startup of the classification server, once data is present, the model will begin training. It will ask for a **regularization coefficient** in the console, and wait for a user input.
+   1. If the server is run in training mode (see [usage](#usage)), the model will begin training. It will ask for a **regularization coefficient** in the console, and wait for a user input.
    The regularization coefficient (hereby referred to as λ) is a hyperparameter: a parameter that will affect the training process of the model. 
    It is meant to help adjust the training process so that it can run on multiple dataset sizes.
 
-   **A good λ to start at is 1e-6**. Enter that, then let the model begin training. If the first loss value reported is above 15, restart the program and enter a slightly lower λ . If the first loss value reported is below 10, restart the program and enter a slightly higher λ.
+   2. **A good λ to start at is 1e-6**. Enter that, then let the model begin training. If the first loss value reported is above 15, restart the program and enter a slightly lower λ . If the first loss value reported is below 10, restart the program and enter a slightly higher λ.
    For the model to train properly, you need the first loss value to be between 10 and 15. 
    
-   *For example*: on a dataset of 2600 images, the model reached 100% accuracy with λ = 2e-5.
+   3. *For example*: on a dataset of 2600 images, the model reached 100% accuracy with λ = 2e-5.
+2. **Prediction:**
+   The model's response to an assessment request should look like this:
+   ```text
+   {"x1: 0, y1: 0, x2: image_width, y2: image_height":
+   {"class_1":"0.037525166","class_2":"0.021139832","class_3":"0.09072289",...
+   ```
+   If the model returns a 400 Bad Request, there is something wrong with the curl call that requests an assessment (see [usage](#usage) for the correct call).
+   If the model returns something other than either of the previous responses, there is an error within the product classifier. If it persists, please reach out to Op-Smart technical support. 
+   
 
 ## Image Splitter
 
@@ -69,7 +72,25 @@ To get started, <b>you need to have Python 3.10+ installed.</b> The installer fo
 To start the server, run:
 
 ```bash
-python server.py
+python main.py
+```
+
+To start the server in **training mode**, run:
+```bash
+python main.py --train
+
+# Note: you can use the --data tag to specify the filepath to the root
+# folder of your data, with the current directory being the default. Example:
+python main.py --train --data "C:\Path\to\your\data"
+```
+
+All assessment requests should be formatted as so:
+```bash
+   curl --data-raw "{\"file_name\":\"/your/file/path\"}" -H "Content-Type: application/json" -L -X POST http://localhost:5000/predict >/your/file/path.txt
+   # Note: if this call does not function properly as a Shell command, enter it in cmd instead
 ```
 
 ## License
+
+This package has been designed for, and solely for, Op-Smart, Inc. and Andrew Marous. Any usage of these packages outside of
+Op-Smart must be accompanied by written permission for their from the company. 

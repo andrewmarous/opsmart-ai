@@ -31,8 +31,8 @@ def train_model(data_filepath, dict_path):
 
     os.system('python model_training/dataset_builder.py --data ' + data_filepath)
     label_dict = read_dict_csv(dict_path)
-    l1_reg = input("Enter a ")
-    image_model.train_model(len(label_dict))
+    l1_reg = input("Enter your desired regularization constant (see README for details): ")
+    image_model.train_model(len(label_dict), l1_reg)
 
 
 def init_model(weights_path, dict_path):
@@ -124,7 +124,8 @@ if args.train:
     answer = ''
     valid_answers = {'y', 'n'}
     while answer not in valid_answers:
-        answer = input('Are you sure you want to continue? (y/n)')
+        answer = input('Are you sure you want to continue? (y/n) '
+                       '')
     if answer == 'n':
         exit(500)
     if not os.path.exists(data_path):
@@ -138,5 +139,4 @@ init_model(model_path, dictionary_path)
 # start the flask app, allow remote connections
 app.run(host='0.0.0.0', port=port)
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
 
