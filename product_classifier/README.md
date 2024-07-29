@@ -20,7 +20,7 @@ There are three components: the product classifier, the image splitter, and the 
 
 ## Installation
 
-To get started, <b>you need to have Python 3.10+ installed.</b> The Windows installer for Python 3.11, which fulfills this requirement, can be downloaded by [clicking this link.](https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe) You can set up the project using the following steps:
+To train the model, <b>you need to have Python 3.10+ installed.</b> The Windows installer for Python 3.11, which fulfills this requirement, can be downloaded by [clicking this link.](https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe) You can set up the project using the following steps:
 
 
 1. **Install the dependencies:**
@@ -40,6 +40,19 @@ To get started, <b>you need to have Python 3.10+ installed.</b> The Windows inst
 
    During training, you will be asked for a *regularization coefficient* (see [Product Classifier](#product-classifier) for more information).
    Once that is entered, the model will begin training and stop once it reaches 100% accuracy. The server will start running once training has completed.
+
+
+3. **Compile server into executable:**
+   ```bash
+   pyinstaller --add-data "model.pth" --add-data "label_dict.csv" --onefile main.py
+   ```
+   **If you are installing this program on a machine without Python, you need to do this step.** The server will not start up or run properly if an environment is not 
+   set up on the target computer, so any usage of this model on a non-development machine must be through a standalone executable. Once the process has completed, you can find the executable at this subdirectory: 
+   ```text
+   dist\main.exe
+   ```
+
+   *Note: PyInstaller creates an executable based on the OS it is running on, so this command must be run on a computer with the same OS as the target machine. *
 
 ## Product Classifier
 

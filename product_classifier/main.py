@@ -62,6 +62,7 @@ def init_model(weights_path, dict_path):
 
 @app.route("/predict", methods=["GET", "POST"])
 def predict():
+    print("Request recieved.")
     # Check for JSON or form data
     if flask.request.is_json:
         params = flask.request.json
@@ -70,6 +71,8 @@ def predict():
 
     if 'file_name' not in params:
         return flask.jsonify({'error': 'file_name not provided'}), 400
+
+    print("Request ")
 
     try:
         image_path = params['file_name']

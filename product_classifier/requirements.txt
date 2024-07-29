@@ -4,6 +4,10 @@
 #
 #    pip-compile requirements.in
 #
+altgraph==0.17.4
+    # via
+    #   macholib
+    #   pyinstaller
 blinker==1.8.2
     # via flask
 click==8.1.7
@@ -20,6 +24,8 @@ jinja2==3.1.4
     # via
     #   flask
     #   torch
+macholib==1.16.3
+    # via pyinstaller
 markupsafe==2.1.5
     # via
     #   jinja2
@@ -32,10 +38,18 @@ numpy==1.26.4
     # via
     #   pandas
     #   torchvision
+packaging==24.1
+    # via
+    #   pyinstaller
+    #   pyinstaller-hooks-contrib
 pandas==2.2.2
     # via -r requirements.in
 pillow==10.4.0
     # via torchvision
+pyinstaller==6.9.0
+    # via -r requirements.in
+pyinstaller-hooks-contrib==2024.7
+    # via pyinstaller
 python-dateutil==2.9.0.post0
     # via pandas
 pytz==2024.1
@@ -56,3 +70,6 @@ tzdata==2024.1
     # via pandas
 werkzeug==3.0.3
     # via flask
+
+# The following packages are considered to be unsafe in a requirements file:
+# setuptools
