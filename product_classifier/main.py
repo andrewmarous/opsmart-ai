@@ -1,5 +1,7 @@
 import flask
 import os
+import time
+import subprocess
 import torch
 import torchvision.models as models
 import torch.nn.functional as F
@@ -29,9 +31,10 @@ def read_dict_csv(filepath):
 def train_model(data_filepath, dict_path):
     global label_dict
 
-    os.system('python model_training/dataset_builder.py --data ' + data_filepath)
+    subprocess.run(['python', 'model_training/dataset_builder', '--data', data_filepath])
+    time.sleep(1)
     label_dict = read_dict_csv(dict_path)
-    l1_reg = input("Enter your desired regularization constant (see README for details): ")
+    l1_reg = float(input("Enter your desired regularization constant (see README for details): "))
     image_model.train_model(len(label_dict), l1_reg)
 
 
@@ -62,7 +65,6 @@ def init_model(weights_path, dict_path):
 
 @app.route("/predict", methods=["GET", "POST"])
 def predict():
-    print("Request recieved.")
     # Check for JSON or form data
     if flask.request.is_json:
         params = flask.request.json
